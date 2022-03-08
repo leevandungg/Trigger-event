@@ -1,4 +1,4 @@
-﻿-- Trigger : Khi mua một đơn hàng nào đó thì số lượng đặt hàng nhỏ hơn hoặc bằng số lượng hiện có và tự động tính tiền
+﻿-- Trigger of DŨNG : Khi mua một đơn hàng nào đó thì số lượng đặt hàng nhỏ hơn hoặc bằng số lượng hiện có và tự động tính tiền
 CREATE TRIGGER trg_Check_Order ON CHITIETHOADON FOR INSERT, UPDATE AS
 BEGIN
      DECLARE @SoLuongMua int, @SoLuongHienCo int, @GiaSP int, @MaSP NVARCHAR(50), @TongTien int, @MaDH NVARCHAR(50), @SoLuongDaMua int, @MaCT NVARCHAR(50)
