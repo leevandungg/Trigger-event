@@ -35,3 +35,49 @@ INSERT INTO DONHANG VALUES('DH006','2022-03-08',N'Đang giao',0,'KH003','SP001',
 INSERT INTO CHITIETHOADON VALUES ('CT006',3,20000,0,'DH006','SP001')
 
 GO
+
+
+
+
+--- Trigger of CẢM: Tạo trigger khi tiến hành cập nhật SoluongSP của bảng PRODUCT thì số lượng sản phẩm >= số lượng đặt hàng của bảng CHITIETHOADON
+
+CREATE TRIGGER Tr_update
+	ON dbo.PRODUCT
+FOR UPDATE 
+AS 
+	IF(SELECT SUM(dbo.PRODUCT.SoluongSP)
+		FROM dbo.PRODUCT INNER JOIN Inserted 
+			ON Inserted.MaSP = PRODUCT.MaSP )<
+	(SELECT SUM(dbo.CHITIETHOADON.SoLuong)
+		FROM dbo.CHITIETHOADON INNER JOIN Inserted 
+			ON Inserted.MaSP = CHITIETHOADON.MaSP)
+BEGIN 
+	PRINT N'tổng số lượng nhập nhỏ hơn số lượng đặt hàng'
+	ROLLBACK TRAN
+END
+ 
+
+ 	--cập nhập số lượng lớn hơn SL hiện có
+
+  UPDATE dbo.PRODUCT
+  SET SoluongSP = 30 WHERE MaSP = 'SP001'
+
+  SELECT * FROM dbo.PRODUCT
+
+	 --cập nhập số lượng nhỏ hơn SL hiện có
+
+ UPDATE dbo.PRODUCT
+ SET SoluongSP = 1 WHERE MaSP = 'SP001'
+
+ SELECT * FROM dbo.PRODUCT
+ 
+ -- Event OF CẢM: Tạo 1 event cứ mỗi 15 ngày sẽ cập nhật lại  GiaSP của bảng PRODUCT 1 lần với GiaSP cố định là 2000 trên mỗi SP. 
+ 
+CREATE EVENT eve_update   
+ON SCHEDULE EVERY 15 day
+STARTS CURRENT_TIMESTAMP
+ENDS CURRENT_TIMESTAMP + INTERVAL 1 MONTH
+    DO
+      UPDATE PRODUCT SET GiaSP = GiaSP + 2000;
+      
+	select * from product;
